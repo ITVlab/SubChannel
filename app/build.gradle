@@ -43,7 +43,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
 //    compile 'com.github.itvlab:youtube-tv-player:0.1.0'
     compile 'com.github.itvlab:youtube-tv-player:-SNAPSHOT'
-    compile 'com.github.fleker:channelsurfer:0.2.12'
+    compile 'com.github.fleker:channelsurfer:0.2.18'
 
     testCompile 'junit:junit:4.10'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

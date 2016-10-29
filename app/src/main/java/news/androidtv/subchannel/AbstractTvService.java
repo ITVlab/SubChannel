@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.icu.text.AlphabeticIndex;
+import android.media.PlaybackParams;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputService;
 import android.net.Uri;
@@ -15,8 +16,10 @@ import android.support.annotation.RequiresApi;
 import android.view.Surface;
 import android.view.View;
 
+import com.felkertech.channelsurfer.interfaces.TimeShiftable;
 import com.felkertech.channelsurfer.model.Channel;
 import com.felkertech.channelsurfer.model.Program;
+import com.felkertech.channelsurfer.service.SimpleSessionImpl;
 import com.felkertech.channelsurfer.service.TvInputProvider;
 import com.felkertech.channelsurfer.sync.SyncAdapter;
 import com.felkertech.channelsurfer.utils.TvContractUtils;
@@ -25,6 +28,7 @@ import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +40,7 @@ import news.androidtv.subchannel.utils.YoutubeUtils;
  * Created by Nick on 10/28/2016.
  */
 
-public class AbstractTvService extends TvInputProvider {
+public class AbstractTvService extends TvInputProvider implements TimeShiftable {
     private List<Submission> submissions;
     private YouTubePlayerView youTubePlayerView;
 
@@ -132,6 +136,74 @@ public class AbstractTvService extends TvInputProvider {
     @Override
     public RecordingSession onCreateRecordingSession(String inputId) {
         return new RedditRecordingSession(getApplicationContext());
+    }
+
+    @Override
+    public void onMediaPause() {
+
+    }
+
+    @Override
+    public void onMediaResume() {
+
+    }
+
+    @Override
+    public void onMediaSeekTo(long timeMs) {
+
+    }
+
+    @Override
+    public long mediaGetStartMs() {
+        return 0;
+    }
+
+    @Override
+    public long mediaGetCurrentMs() {
+        return 10;
+    }
+
+    @Override
+    public void onMediaSetPlaybackParams(PlaybackParams playbackParams) {
+
+    }
+
+    private RedditTvSession redditTvSession;
+
+    @Nullable
+    @Override
+    public Session onCreateSession(String inputId) {
+        redditTvSession = new RedditTvSession(this);
+        return redditTvSession;
+    }
+
+    @Override
+    public SimpleSessionImpl getSession() {
+        return redditTvSession;
+    }
+
+    private class RedditTvSession extends SimpleSessionImpl {
+        RedditTvSession(TvInputProvider tvInputProvider) {
+            super(tvInputProvider);
+        }
+
+        @Override
+        public void onTimeShiftPlay(Uri recordedProgramUri) {
+            notifyVideoAvailable();
+            setOverlayEnabled(true);
+            youTubePlayerView.setVideoEventsListener(new AbstractWebPlayer.VideoEventsListener() {
+                @Override
+                public void onVideoEnded() {
+                    // Video ended. That's it.
+                }
+            });
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    youTubePlayerView.loadVideo(YoutubeUtils.parseVideoId("q0P4SFrjA4Y"));
+                }
+            });
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
