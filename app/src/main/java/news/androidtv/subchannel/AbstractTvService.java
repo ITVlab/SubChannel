@@ -1,9 +1,17 @@
 package news.androidtv.subchannel;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.icu.text.AlphabeticIndex;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputService;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.view.Surface;
 import android.view.View;
 
@@ -117,5 +125,53 @@ public class AbstractTvService extends TvInputProvider {
             }
         });
         return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Nullable
+    @Override
+    public RecordingSession onCreateRecordingSession(String inputId) {
+        return new RedditRecordingSession(getApplicationContext());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private class RedditRecordingSession extends RecordingSession {
+        /**
+         * Creates a new RecordingSession.
+         *
+         * @param context The context of the application
+         */
+        public RedditRecordingSession(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onTune(Uri channelUri) {
+            // Right now we only have one channel
+            notifyTuned(channelUri);
+        }
+
+        @Override
+        public void onStartRecording(Uri programUri) {
+            // Don't bother with program uri
+        }
+
+        @Override
+        public void onStopRecording() {
+            // Just save a random program
+            ContentValues recordedProgram = new ContentValues();
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_TITLE, "Saved Program");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_THUMBNAIL_URI, "http://theawesomer.com/photos/2012/06/140612_youtube_haiku_t.jpg");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_RECORDING_DURATION_MILLIS, 1000 * 60);
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_START_TIME_UTC_MILLIS, System.currentTimeMillis());
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_INTERNAL_PROVIDER_DATA, "q0P4SFrjA4Y");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_SEARCHABLE, 1);
+            getContentResolver().insert(TvContract.RecordedPrograms.CONTENT_URI, recordedProgram);
+        }
+
+        @Override
+        public void onRelease() {
+
+        }
     }
 }
