@@ -1,5 +1,7 @@
 package news.androidtv.subchannel;
 
+import android.database.Cursor;
+import android.media.tv.TvContract;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +46,18 @@ public class MainActivity extends AppCompatActivity {
                 for (Submission s : posts) {
                     Log.d(TAG, s.getTitle());
                     Log.d(TAG, "    " + s.getUrl());
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    Cursor cursor = getContentResolver().query(TvContract.RecordedPrograms.CONTENT_URI, null, null, null, null);
+                    Log.d(TAG, "Recorded Programs: " + cursor.getCount());
+                    while (cursor.moveToNext()) {
+                        Log.d(TAG, cursor.getString(cursor.getColumnIndex(TvContract.RecordedPrograms.COLUMN_TITLE)));
+                    }
                 }
             }
         }).start();

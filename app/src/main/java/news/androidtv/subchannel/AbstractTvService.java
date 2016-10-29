@@ -211,7 +211,9 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
         @Override
         public void onTimeShiftPlay(Uri recordedProgramUri) {
             notifyVideoAvailable();
+            setOverlayEnabled(false);
             setOverlayEnabled(true);
+            onCreateOverlayView();
             youTubePlayerView.setVideoEventsListener(new AbstractWebPlayer.VideoEventsListener() {
                 @Override
                 public void onVideoEnded() {
@@ -248,18 +250,24 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
         @Override
         public void onStartRecording(Uri programUri) {
             // Don't bother with program uri
+            Log.d(TAG, "Recording started");
         }
 
         @Override
         public void onStopRecording() {
             // Just save a random program
             ContentValues recordedProgram = new ContentValues();
-            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_TITLE, "Saved Program");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_TITLE, "A YouTube Video");
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_THUMBNAIL_URI, "http://theawesomer.com/photos/2012/06/140612_youtube_haiku_t.jpg");
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_RECORDING_DURATION_MILLIS, 1000 * 60);
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_START_TIME_UTC_MILLIS, System.currentTimeMillis());
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_END_TIME_UTC_MILLIS, System.currentTimeMillis() + 1000 * 60);
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_INTERNAL_PROVIDER_DATA, "q0P4SFrjA4Y");
-            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_SEARCHABLE, 1);
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_RECORDING_DATA_URI, "http://www.youtube.com/watch?v=q0P4SFrjA4Y");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_SHORT_DESCRIPTION, "This is a YouTube video to something");
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_RECORDING_DATA_BYTES, 1024);
+            recordedProgram.put(TvContract.RecordedPrograms.COLUMN_INPUT_ID, "news.androidtv.subchannel/.AbstractTvService");
+            Log.d(TAG, "Recording stopped");
             notifyRecordingStopped(getContentResolver().insert(TvContract.RecordedPrograms.CONTENT_URI, recordedProgram));
 
         }
