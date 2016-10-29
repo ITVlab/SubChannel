@@ -28,7 +28,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.media.tv.input"
-                android:resource="@xml/channel_surfer_tv_input" />
+                android:resource="@xml/subchannel" />
         </service>
 
         <meta-data

@@ -44,6 +44,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
 
     private List<Submission> submissions;
     private YouTubePlayerView youTubePlayerView;
+    private RedditTvSession redditTvSession;
     private boolean play;
 
     public AbstractTvService() {
@@ -69,6 +70,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
         List<Channel> channelList = new ArrayList<>();
         channelList.add(new Channel()
                 .setName("/r/YouTubeHaiku")
+                .setLogoUrl("http://theawesomer.com/photos/2012/06/140612_youtube_haiku_t.jpg")
                 .setNumber("1"));
         return channelList;
     }
@@ -140,6 +142,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
     @Nullable
     @Override
     public RecordingSession onCreateRecordingSession(String inputId) {
+        Log.d(TAG, "Want to create a new recording session " + inputId);
         return new RedditRecordingSession(getApplicationContext());
     }
 
@@ -172,8 +175,6 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
     public void onMediaSetPlaybackParams(PlaybackParams playbackParams) {
 
     }
-
-    private RedditTvSession redditTvSession;
 
     @Nullable
     @Override
@@ -235,6 +236,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
          */
         public RedditRecordingSession(Context context) {
             super(context);
+            Log.d(TAG, "Recording Session Created");
         }
 
         @Override
