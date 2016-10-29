@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="news.androidtv.subchannel" >
+    package="news.androidtv.subchannel">
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -13,6 +15,33 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".AbstractTvService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TV_INPUT">
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.media.tv.input"
+                android:resource="@xml/channel_surfer_tv_input" />
+        </service>
+
+        <meta-data
+            android:name="TvInputService"
+            android:value="news.androidtv.subchannel.AbstractTvService" />
+
+        <activity
+            android:name=".SampleTvSetup"
+            android:exported="true"
+            android:enabled="true"
+            android:label="Init">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
     </application>
