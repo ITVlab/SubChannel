@@ -1,18 +1,19 @@
 package news.androidtv.subchannel;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.icu.text.AlphabeticIndex;
 import android.media.PlaybackParams;
 import android.media.tv.TvContract;
-import android.media.tv.TvInputService;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 
@@ -22,13 +23,11 @@ import com.felkertech.channelsurfer.model.Program;
 import com.felkertech.channelsurfer.service.SimpleSessionImpl;
 import com.felkertech.channelsurfer.service.TvInputProvider;
 import com.felkertech.channelsurfer.sync.SyncAdapter;
-import com.felkertech.channelsurfer.utils.TvContractUtils;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +40,8 @@ import news.androidtv.subchannel.utils.YoutubeUtils;
  */
 
 public class AbstractTvService extends TvInputProvider implements TimeShiftable {
+    private static final String TAG = AbstractTvService.class.getSimpleName();
+
     private List<Submission> submissions;
     private YouTubePlayerView youTubePlayerView;
     private boolean play;
@@ -183,6 +184,20 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Log.d(TAG, "About to set recording");
+            TvInputInfo info = new TvInputInfo.Builder(getApplicationContext(), new ComponentName(getApplicationContext(), AbstractTvService.class))
+                    .setCanRecord(true)
+                    .setTunerCount(1)
+                    .build();
+            ((TvInputManager) getSystemService(Context.TV_INPUT_SERVICE)).updateTvInputInfo(info);
+            Log.d(TAG, "This app can record");
+        }
+    }
+
+    @Override
     public SimpleSessionImpl getSession() {
         return redditTvSession;
     }
@@ -243,7 +258,8 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_START_TIME_UTC_MILLIS, System.currentTimeMillis());
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_INTERNAL_PROVIDER_DATA, "q0P4SFrjA4Y");
             recordedProgram.put(TvContract.RecordedPrograms.COLUMN_SEARCHABLE, 1);
-            getContentResolver().insert(TvContract.RecordedPrograms.CONTENT_URI, recordedProgram);
+            notifyRecordingStopped(getContentResolver().insert(TvContract.RecordedPrograms.CONTENT_URI, recordedProgram));
+
         }
 
         @Override
