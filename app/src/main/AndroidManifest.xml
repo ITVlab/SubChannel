@@ -36,7 +36,7 @@
             android:value="news.androidtv.subchannel.AbstractTvService" />
 
         <activity
-            android:name=".SampleTvSetup"
+            android:name=".SetupActivity"
             android:exported="true"
             android:enabled="true"
             android:label="Init">

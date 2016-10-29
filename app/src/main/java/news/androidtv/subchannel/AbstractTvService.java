@@ -2,6 +2,8 @@ package news.androidtv.subchannel;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Surface;
 import android.view.View;
 
@@ -99,7 +101,8 @@ public class AbstractTvService extends TvInputProvider {
 
     @Override
     public boolean onTune(final Channel channel) {
-        Program program = getProgramRightNow(channel);
+        final Program program = getProgramRightNow(channel);
+        notifyVideoAvailable();
         setOverlayEnabled(true);
         youTubePlayerView.setVideoEventsListener(new AbstractWebPlayer.VideoEventsListener() {
             @Override
@@ -107,7 +110,12 @@ public class AbstractTvService extends TvInputProvider {
                 onTune(channel);
             }
         });
-        youTubePlayerView.loadVideo(YoutubeUtils.parseVideoId(program.getInternalProviderData()));
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                youTubePlayerView.loadVideo(YoutubeUtils.parseVideoId(program.getInternalProviderData()));
+            }
+        });
         return true;
     }
 }
