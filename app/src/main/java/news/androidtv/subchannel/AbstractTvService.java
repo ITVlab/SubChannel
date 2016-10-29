@@ -43,6 +43,7 @@ import news.androidtv.subchannel.utils.YoutubeUtils;
 public class AbstractTvService extends TvInputProvider implements TimeShiftable {
     private List<Submission> submissions;
     private YouTubePlayerView youTubePlayerView;
+    private boolean play;
 
     public AbstractTvService() {
     }
@@ -100,7 +101,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
 
     @Override
     public void onRelease() {
-
+        play = false;
     }
 
     @Override
@@ -113,13 +114,16 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
 
     @Override
     public boolean onTune(final Channel channel) {
+        play = true;
         final Program program = getProgramRightNow(channel);
         notifyVideoAvailable();
         setOverlayEnabled(true);
         youTubePlayerView.setVideoEventsListener(new AbstractWebPlayer.VideoEventsListener() {
             @Override
             public void onVideoEnded() {
-                onTune(channel);
+                if (play) {
+                    onTune(channel);
+                }
             }
         });
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -174,6 +178,7 @@ public class AbstractTvService extends TvInputProvider implements TimeShiftable 
     @Override
     public Session onCreateSession(String inputId) {
         redditTvSession = new RedditTvSession(this);
+        simpleSession = redditTvSession;
         return redditTvSession;
     }
 
