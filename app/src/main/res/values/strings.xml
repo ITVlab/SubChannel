@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">SubChannel</string>
     <string name="tv_input_activity">news.androidtv.subchannel.SetupActivity</string>
+    <string name="sync_channels">Sync Channels</string>
+    <string name="in_progress">In Progress</string>
+    <string name="toast_scan_channels_added">Channels Added</string>
+    <string name="toast_scan_error_found">Error Found:</string>
+    <string name="error_sync_canceled">Sync canceled</string>
+    <string name="error_sync_no_data">No data found</string>
+    <string name="error_sync_default">Sync error %1$d</string>
 </resources>

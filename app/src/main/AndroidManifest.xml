@@ -13,13 +13,12 @@
         <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service
-            android:name=".AbstractTvService"
+            android:name=".services.TifPlaybackService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_TV_INPUT">
@@ -30,10 +29,6 @@
                 android:name="android.media.tv.input"
                 android:resource="@xml/subchannel" />
         </service>
-
-        <meta-data
-            android:name="TvInputService"
-            android:value="news.androidtv.subchannel.AbstractTvService" />
 
         <activity
             android:name=".SetupActivity"

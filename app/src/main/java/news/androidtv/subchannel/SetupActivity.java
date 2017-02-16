@@ -1,10 +1,17 @@
 package news.androidtv.subchannel;
 
-import com.felkertech.channelsurfer.setup.SimpleTvSetup;
+import android.app.Activity;
+import android.os.Bundle;
 
 /**
  * Created by Nick on 10/28/2016.
  */
 
-public class SetupActivity extends SimpleTvSetup {
+public class SetupActivity extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setup);
+        getActionBar().hide();
+    }
 }
