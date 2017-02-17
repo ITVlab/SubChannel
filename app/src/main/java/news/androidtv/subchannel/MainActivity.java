@@ -25,6 +25,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final boolean DEBUG = false;
 
     private RestClient restClient = new PoliteHttpRestClient();
     private Submissions subs;
@@ -39,7 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
         subs = new Submissions(restClient);
 
-        Log.d(TAG, "Get some posts");
+        if (DEBUG) {
+            Log.d(TAG, "Get some posts");
+        }
         logView = (TextView) findViewById(R.id.logs);
         findViewById(R.id.livechannels).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,10 +60,14 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 List<Submission> posts = subs.ofSubreddit("youtubehaiku", null, -1, 100, null, null, true);
                 appendLog("Popular posts retrieved");
-                Log.d(TAG, "Posts gotten: " + posts.size());
+                if (DEBUG) {
+                    Log.d(TAG, "Posts gotten: " + posts.size());
+                }
                 for (Submission s : posts) {
-                    Log.d(TAG, s.getTitle());
-                    Log.d(TAG, "    " + s.getUrl());
+                    if (DEBUG) {
+                        Log.d(TAG, s.getTitle());
+                        Log.d(TAG, "    " + s.getUrl());
+                    }
                     appendLog(s.getTitle() + "   " + s.getUrl());
                 }
             }
@@ -70,10 +77,14 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     Cursor cursor = getContentResolver().query(TvContract.RecordedPrograms.CONTENT_URI, null, null, null, null);
-                    Log.d(TAG, "Recorded Programs: " + cursor.getCount());
+                    if (DEBUG) {
+                        Log.d(TAG, "Recorded Programs: " + cursor.getCount());
+                    }
                     appendLog("Found " + cursor.getCount() + " recorded programs");
                     while (cursor.moveToNext()) {
-                        Log.d(TAG, cursor.getString(cursor.getColumnIndex(TvContract.RecordedPrograms.COLUMN_TITLE)));
+                        if (DEBUG) {
+                            Log.d(TAG, cursor.getString(cursor.getColumnIndex(TvContract.RecordedPrograms.COLUMN_TITLE)));
+                        }
                         appendLog("RP: " + cursor.getString(cursor.getColumnIndex(TvContract.RecordedPrograms.COLUMN_TITLE)));
                     }
                 }
