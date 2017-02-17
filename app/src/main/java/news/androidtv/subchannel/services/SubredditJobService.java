@@ -76,7 +76,7 @@ public class SubredditJobService extends EpgSyncJobService {
         List<Channel> channelList = new ArrayList<>();
         channelList.add(new Channel.Builder()
                 .setDisplayName("/r/YouTubeHaiku")
-                .setChannelLogo("http://theawesomer.com/photos/2012/06/140612_youtube_haiku_t.jpg")
+                .setChannelLogo("https://raw.githubusercontent.com/ITVlab/SubChannel/master/store/haiku.PNG")
                 .setDisplayNumber("1")
                 .setOriginalNetworkId(0)
                 .build());
