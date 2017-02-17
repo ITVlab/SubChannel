@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         getPosts();
+        getSupportActionBar().hide();
     }
 
     public void getPosts() {

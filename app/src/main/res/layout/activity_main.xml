@@ -5,20 +5,34 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="horizontal"
     tools:context="news.androidtv.subchannel.MainActivity">
-    <Button
-        android:layout_width="wrap_content"
-        android:text="Open Live Channels"
-        android:id="@+id/livechannels"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/logs"
-        android:text="" />
+    <LinearLayout
+        android:layout_width="480dp"
+        android:orientation="vertical"
+        android:background="#D84315"
+        android:padding="16dp"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:textColor="@android:color/white"
+            android:text="@string/long_description"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_height="match_parent">
+        <Button
+            android:layout_width="wrap_content"
+            android:text="Open Live Channels"
+            android:id="@+id/livechannels"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/logs"
+            android:text="" />
+    </LinearLayout>
 </LinearLayout>
