@@ -76,10 +76,15 @@ public class TifPlaybackService extends BaseTvInputService {
             mContext = context;
             mInputId = inputId;
             onCreateOverlayView();
+            TvInputManager manager = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+            }
         }
 
         @Override
         public TvPlayer getTvPlayer() {
+            mYouTubePlayerView.setVolume(0.95f);
             return mYouTubePlayerView;
         }
 
@@ -130,7 +135,7 @@ public class TifPlaybackService extends BaseTvInputService {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            mYouTubePlayerView.setVolume(0.5f);
+                            mYouTubePlayerView.setVolume(0.95f);
                         }
                     });
                 }
@@ -208,15 +213,21 @@ public class TifPlaybackService extends BaseTvInputService {
             if (query == null) {
                 return null;
             }
-            Log.d(TAG, "Program " + currentProgram.getTitle() + " ended");
+            if (DEBUG) {
+                Log.d(TAG, "Program " + currentProgram.getTitle() + " ended");
+            }
             while (query.moveToNext()) {
                 Program program = Program.fromCursor(query);
-                Log.i(TAG, "* " + program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
+                if (DEBUG) {
+                    Log.i(TAG, "* " + program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
+                }
                 if (program.equals(currentProgram)) {
                     // Get next
                     while (program.equals(currentProgram) && query.moveToNext()) {
                         program = Program.fromCursor(query);
-                        Log.i(TAG, program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
+                        if (DEBUG) {
+                            Log.i(TAG, program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
+                        }
                     }
                     if (!query.isLast()) {
                         if (query.getPosition() == query.getCount()) {
@@ -224,14 +235,18 @@ public class TifPlaybackService extends BaseTvInputService {
                         }
                         Program next = Program.fromCursor(query);
                         query.close();
-                        Log.i(TAG, "Selected next program " + next.getTitle());
+                        if (DEBUG) {
+                            Log.i(TAG, "Selected next program " + next.getTitle());
+                        }
                         return next;
                     } else {
                         // Get first
                         query.moveToFirst();
                         Program next = Program.fromCursor(query);
                         query.close();
-                        Log.i(TAG, "Selected first program " + next.getTitle());
+                        if (DEBUG) {
+                            Log.i(TAG, "Selected first program " + next.getTitle());
+                        }
                         return next;
                     }
                 }

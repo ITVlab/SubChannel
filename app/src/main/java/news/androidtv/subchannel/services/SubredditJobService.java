@@ -95,7 +95,7 @@ public class SubredditJobService extends EpgSyncJobService {
                     .setThumbnailUri(s.getThumbnail())
                     .setDescription("Posted by " + s.getAuthor())
                     .setInternalProviderData(data)
-                    .setStartTimeUtcMillis(startMs)
+                    .setStartTimeUtcMillis(startMs + 1000 * 60 * i)
                     .setEndTimeUtcMillis(startMs + 1000 * 60 * (i + 1)) // FIXME Don't know the video duration
                     .build());
         }
