@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -42,8 +43,7 @@ dependencies {
     }
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
     compile 'com.github.fleker:settingsmanager:1.3.+'
-//    compile 'com.github.itvlab:youtube-tv-player:0.1.0'
-    compile 'com.github.itvlab:youtube-tv-player:-SNAPSHOT'
+    compile 'com.github.itvlab:youtube-tv-player:329d87ef4d'
     compile 'com.google.android.libraries.tv:companionlibrary:0.1'
 
     testCompile 'junit:junit:4.10'

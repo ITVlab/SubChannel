@@ -3,6 +3,10 @@
     package="news.androidtv.subchannel">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required to restart job service -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
 
     <application
         android:allowBackup="true"
@@ -29,6 +33,11 @@
                 android:name="android.media.tv.input"
                 android:resource="@xml/subchannel" />
         </service>
+
+        <service android:name=".services.SubredditJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:enabled="true"
+            />
 
         <activity
             android:name=".SetupActivity"

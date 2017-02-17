@@ -78,6 +78,7 @@ public class SubredditJobService extends EpgSyncJobService {
                 .setDisplayName("/r/YouTubeHaiku")
                 .setChannelLogo("http://theawesomer.com/photos/2012/06/140612_youtube_haiku_t.jpg")
                 .setDisplayNumber("1")
+                .setOriginalNetworkId(0)
                 .build());
         return channelList;
     }
@@ -95,7 +96,7 @@ public class SubredditJobService extends EpgSyncJobService {
                     .setDescription("Posted by " + s.getAuthor())
                     .setInternalProviderData(data)
                     .setStartTimeUtcMillis(startMs)
-                    .setEndTimeUtcMillis(startMs + 1000 * 60 * i) // FIXME Don't know the video duration
+                    .setEndTimeUtcMillis(startMs + 1000 * 60 * (i + 1)) // FIXME Don't know the video duration
                     .build());
         }
         return programList;
