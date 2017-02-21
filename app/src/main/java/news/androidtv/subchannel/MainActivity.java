@@ -22,6 +22,7 @@ import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 
 import io.fabric.sdk.android.Fabric;
+import news.androidtv.subchannel.fragments.SubredditCreationDialogFragment;
 import news.androidtv.subchannel.utils.SubchannelSettingsManager;
 
 import org.sonatype.guice.bean.containers.Main;
@@ -78,9 +79,10 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Add Subreddit", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                // Create an "Add Subreddit" button
-                                Toast.makeText(MainActivity.this, "Not supported...",
-                                        Toast.LENGTH_SHORT).show();
+                                // Create an "Add Subreddit" dialog
+                                SubredditCreationDialogFragment dialogFragment =
+                                        new SubredditCreationDialogFragment();
+                                dialogFragment.show(getFragmentManager(), "SUBREDDIT");
                             }
                         })
                         .show();

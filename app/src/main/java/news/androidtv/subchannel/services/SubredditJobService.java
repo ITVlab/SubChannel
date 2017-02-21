@@ -132,8 +132,8 @@ public class SubredditJobService extends EpgSyncJobService {
         } catch (InternalProviderData.ParseException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < submissions.size(); i++) {
-            Submission s = submissions.get(i);
+        int i = 0;
+        for (Submission s : submissions) {
             // Make sure this is a YouTube video
             if (YoutubeUtils.parseVideoId(s.getUrl()) == null) {
                 continue; // Not a YouTube video, ignore post.
@@ -148,6 +148,7 @@ public class SubredditJobService extends EpgSyncJobService {
                     .setStartTimeUtcMillis(startMs + 1000 * 60 * i)
                     .setEndTimeUtcMillis(startMs + 1000 * 60 * (i + 1)) // FIXME Don't know the video duration
                     .build());
+            i++; // Increment index only for valid posts.
         }
         return programList;
     }

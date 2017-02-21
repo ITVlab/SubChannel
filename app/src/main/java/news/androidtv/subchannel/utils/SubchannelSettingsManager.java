@@ -1,6 +1,7 @@
 package news.androidtv.subchannel.utils;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 
 import com.felkertech.settingsmanager.SettingsManager;
@@ -9,6 +10,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import news.androidtv.subchannel.services.SubredditJobService;
 
 /**
  * Created by Nick on 2/20/2017.
@@ -50,6 +53,10 @@ public class SubchannelSettingsManager extends SettingsManager {
         } else {
             setString(SettingConstants.KEY_SUBREDDITS_SAVED, DEFAULT_SUBREDDITS);
         }
+        // Resync
+        SubredditJobService.requestImmediateSync1(getContext(), "news.androidtv.subchannel/.services.TifPlaybackService",
+                SubredditJobService.DEFAULT_IMMEDIATE_EPG_DURATION_MILLIS,
+                new ComponentName(getContext(), SubredditJobService.class));
     }
 
     public void deleteSubreddit(int index) {
