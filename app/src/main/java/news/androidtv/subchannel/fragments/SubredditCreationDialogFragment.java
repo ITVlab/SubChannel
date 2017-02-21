@@ -43,7 +43,8 @@ public class SubredditCreationDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        getDialog().getWindow().setLayout(900, 500);
+        getDialog().setTitle("Add a Subreddit channel");
+        getDialog().getWindow().setLayout(900, 400);
     }
 
 }
