@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.media.tv.TvInputInfo;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import com.felkertech.settingsmanager.SettingsManager;
 import com.google.android.media.tv.companionlibrary.ChannelSetupFragment;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 
+import java.util.Set;
+
 import news.androidtv.subchannel.R;
 import news.androidtv.subchannel.services.SubredditJobService;
 
@@ -22,6 +25,8 @@ import news.androidtv.subchannel.services.SubredditJobService;
  */
 
 public class SetupFragment extends ChannelSetupFragment {
+    private static final String TAG = SetupFragment.class.getSimpleName();
+
     public static final long FULL_SYNC_FREQUENCY_MILLIS = 1000 * 60 * 60 * 24;  // 24 hour
     private static final long FULL_SYNC_WINDOW_SEC = 1000 * 60 * 60 * 24 * 14;  // 2 weeks
 
@@ -32,6 +37,7 @@ public class SetupFragment extends ChannelSetupFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInputId = getActivity().getIntent().getStringExtra(TvInputInfo.EXTRA_INPUT_ID);
+        Log.d(TAG, mInputId);
     }
 
     @Override

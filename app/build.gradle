@@ -22,8 +22,8 @@ android {
         applicationId "news.androidtv.subchannel"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 3
-        versionName "1.0.1"
+        versionCode 4
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

@@ -8,5 +8,7 @@
     <string name="error_sync_canceled">Sync canceled</string>
     <string name="error_sync_no_data">No data found</string>
     <string name="error_sync_default">Sync error %1$d</string>
-    <string name="long_description">"SubChannel is a Live Channel source that will be able to play a variety of YouTube videos from subreddits. At the moment, it will only show /r/youtubehaiku. You will also be able to use the native time-shifting and DVR features in Live Channels. This app is currently in alpha. Please report bugs or contribute to the GitHub project: github.com/itvlab/SubChannel."</string>
+    <string name="long_description">"SubChannel is a Live Channel source that will be able to play a variety of YouTube videos from subreddits. You will also be able to use the native time-shifting and DVR features in Live Channels. This app is currently in alpha. Please report bugs or contribute to the GitHub project: github.com/itvlab/SubChannel."</string>
+    <string name="open_live_channels">Open Live Channels</string>
+    <string name="edit_channels">Edit Channels</string>
 </resources>
