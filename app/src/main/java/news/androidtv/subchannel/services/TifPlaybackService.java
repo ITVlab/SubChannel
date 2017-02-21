@@ -259,6 +259,7 @@ public class TifPlaybackService extends BaseTvInputService {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private class RedditRecordingSession extends BaseTvInputService.RecordingSession {
         private String mInputId;
+        private Uri mChannelUri;
         private long mRecordingStarted;
         private long mRecordingStopped;
 
@@ -272,6 +273,7 @@ public class TifPlaybackService extends BaseTvInputService {
         public void onTune(Uri channelUri) {
             // Right now we only have one channel
             notifyTuned(channelUri);
+            mChannelUri = channelUri;
         }
 
         @Override
@@ -297,7 +299,8 @@ public class TifPlaybackService extends BaseTvInputService {
             ContentResolver contentResolver = getContentResolver();
             mRecordingStopped = System.currentTimeMillis();
             Cursor cursor = contentResolver.query(TvContract.buildProgramsUriForChannel(
-                    channelToRecord.getId(), mRecordingStarted, mRecordingStopped),
+                    Long.parseLong(mChannelUri.getLastPathSegment()),
+                    mRecordingStarted, mRecordingStopped),
                     Program.PROJECTION, null, null, null);
             if (cursor != null) {
                 // Obtain first program
