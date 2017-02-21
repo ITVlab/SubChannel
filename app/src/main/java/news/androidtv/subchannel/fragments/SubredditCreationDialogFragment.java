@@ -39,4 +39,11 @@ public class SubredditCreationDialogFragment extends DialogFragment {
         });
         return mDialogView;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setLayout(900, 500);
+    }
+
 }
