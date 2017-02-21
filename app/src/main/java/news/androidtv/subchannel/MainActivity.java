@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.github.jreddit.entity.Submission;
@@ -51,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(Intent.ACTION_VIEW, TvContract.Channels.CONTENT_URI));
+            }
+        });
+        findViewById(R.id.button_edit_channels).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Not supported...", Toast.LENGTH_SHORT).show();
             }
         });
         getPosts();

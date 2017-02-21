@@ -17,7 +17,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.github.jreddit.entity.Submission;
+import com.github.jreddit.entity.Subreddit;
 import com.github.jreddit.retrieval.Submissions;
+import com.github.jreddit.retrieval.Subreddits;
+import com.github.jreddit.retrieval.params.SubredditsView;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
@@ -28,7 +31,13 @@ import com.google.android.media.tv.companionlibrary.model.Program;
 import junit.framework.Assert;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import news.androidtv.subchannel.utils.SettingConstants;
+import news.androidtv.subchannel.utils.SubchannelSettingsManager;
+import news.androidtv.subchannel.utils.YoutubeUtils;
 
 /**
  * Created by Nick on 2/16/2017.
@@ -38,7 +47,8 @@ public class SubredditJobService extends EpgSyncJobService {
     private static final String TAG = SubredditJobService.class.getSimpleName();
     public static final long DEFAULT_IMMEDIATE_EPG_DURATION_MILLIS = 1000 * 60 * 60; // 1 Hour
 
-    private List<Submission> submissions;
+    private Map<String, List<Submission>> mRetrievedData;
+    private SubchannelSettingsManager settingsManager;
 
     @Override
     public boolean onStartJob(final JobParameters params) {
@@ -48,16 +58,30 @@ public class SubredditJobService extends EpgSyncJobService {
         intent.putExtra(SYNC_STATUS, SYNC_STARTED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
+        settingsManager = new SubchannelSettingsManager(getApplicationContext());
         // Pull data from Reddit
-        submissions = new ArrayList<>();
+        mRetrievedData = new HashMap<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 RestClient restClient = new PoliteHttpRestClient();
                 restClient.setUserAgent("bot/1.0 by name");
                 Submissions subs = new Submissions(restClient);
-                // TODO get other subreddits in the future
-                submissions = subs.ofSubreddit("youtubehaiku", null, -1, 100, null, null, true);
+                Log.d(TAG, "Process all " +
+                        settingsManager.getString(SettingConstants.KEY_SUBREDDITS_SAVED));
+                for (String subreddit : settingsManager.getSubreddits()) {
+                    Log.d(TAG, "Pull subreddit " + subreddit);
+                    List<Submission> submissions =
+                            subs.ofSubreddit(subreddit, null, -1, 100, null, null, true);
+                    mRetrievedData.put(subreddit, submissions);
+
+                    // Right now this doesn't do anything valuable
+/*
+                    Subreddits subreddits = new Subreddits(restClient);
+                    List<Subreddit> subredditMetadata = subreddits.get(
+                            SubredditsView.POPULAR.value(), "1", "1", subreddit, subreddit);
+*/
+                }
                 new Handler(Looper.getMainLooper()) {
                     @Override
                     public void handleMessage(Message msg) {
@@ -74,20 +98,46 @@ public class SubredditJobService extends EpgSyncJobService {
     @Override
     public List<Channel> getChannels() {
         List<Channel> channelList = new ArrayList<>();
-        channelList.add(new Channel.Builder()
-                .setDisplayName("/r/YouTubeHaiku")
-                .setChannelLogo("https://raw.githubusercontent.com/ITVlab/SubChannel/master/store/haiku.PNG")
-                .setDisplayNumber("1")
-                .setOriginalNetworkId(0)
-                .build());
+        int index = 1;
+        for (String subreddit : settingsManager.getSubreddits()) {
+            InternalProviderData internalProviderData = new InternalProviderData();
+            try {
+                internalProviderData.put(TifPlaybackService.IPD_KEY_SUBREDDIT, subreddit);
+            } catch (InternalProviderData.ParseException e) {
+                e.printStackTrace();
+            }
+            channelList.add(new Channel.Builder()
+                    .setDisplayName("/r/" + subreddit)
+                    // TODO Need to obtain different logos somehow
+                    .setChannelLogo("https://raw.githubusercontent.com/ITVlab/SubChannel/master/store/haiku.PNG")
+                    .setDisplayNumber(String.valueOf(index))
+                    .setOriginalNetworkId(subreddit.hashCode())
+                    .setInternalProviderData(internalProviderData)
+                    .build());
+            index++;
+        }
         return channelList;
     }
 
     @Override
     public List<Program> getProgramsForChannel(Uri channelUri, Channel channel, long startMs, long endMs) {
         List<Program> programList = new ArrayList<>();
+        // Get subreddit name
+        String subreddit;
+        List<Submission> submissions = null;
+        try {
+            subreddit = (String) channel.getInternalProviderData()
+                    .get(TifPlaybackService.IPD_KEY_SUBREDDIT);
+            submissions = mRetrievedData.get(subreddit);
+        } catch (InternalProviderData.ParseException e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < submissions.size(); i++) {
             Submission s = submissions.get(i);
+            // Make sure this is a YouTube video
+            if (YoutubeUtils.parseVideoId(s.getUrl()) == null) {
+                continue; // Not a YouTube video, ignore post.
+            }
             InternalProviderData data = new InternalProviderData();
             data.setVideoUrl(s.getUrl());
             programList.add(new Program.Builder()

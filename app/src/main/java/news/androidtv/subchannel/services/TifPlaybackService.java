@@ -37,6 +37,8 @@ public class TifPlaybackService extends BaseTvInputService {
     private static final boolean DEBUG = false;
     private static final long EPG_SYNC_DELAYED_PERIOD_MS = 1000 * 2; // 2 Seconds
 
+    public static final String IPD_KEY_SUBREDDIT = "subreddit_name";
+
     @Override
     public void onCreate() {
         super.onCreate();
