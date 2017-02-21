@@ -5,7 +5,10 @@ import android.content.Context;
 
 import com.felkertech.settingsmanager.SettingsManager;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Nick on 2/20/2017.
@@ -47,5 +50,25 @@ public class SubchannelSettingsManager extends SettingsManager {
         } else {
             setString(SettingConstants.KEY_SUBREDDITS_SAVED, DEFAULT_SUBREDDITS);
         }
+    }
+
+    public void deleteSubreddit(int index) {
+        List<String> subredditsList = getList(getSubreddits());
+        subredditsList.remove(index);
+        saveSubreddits(subredditsList.toArray(new String[subredditsList.size()]));
+    }
+
+    public void addSubreddit(String name) {
+        List<String> subredditsList = getList(getSubreddits());
+        subredditsList.add(name);
+        saveSubreddits(subredditsList.toArray(new String[subredditsList.size()]));
+    }
+
+    private List<String> getList(String[] array) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (String item : array) {
+            arrayList.add(item);
+        }
+        return arrayList;
     }
 }
