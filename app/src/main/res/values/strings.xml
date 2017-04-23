@@ -13,5 +13,6 @@
     <string name="edit_channels">Edit Channels</string>
     <string name="deleted_subreddit">Removed Subreddit from list</string>
     <string name="warning_one_subreddit">You must have at least one subreddit</string>
+    <string name="add_subreddit">Add a Subreddit</string>
     <string name="added_subreddit">Subreddit added</string>
 </resources>

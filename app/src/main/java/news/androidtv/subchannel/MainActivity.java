@@ -73,34 +73,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(Intent.ACTION_VIEW, TvContract.Channels.CONTENT_URI));
             }
         });
-        findViewById(R.id.button_edit_channels).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.button_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.Theme_AppCompat))
-                        .setTitle("Selecting an item deletes it")
-                        .setItems(settingsManager.getSubreddits(), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (settingsManager.getSubreddits().length == 1) {
-                                    Toast.makeText(MainActivity.this, "You must have at least" +
-                                            " one subreddit.", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    settingsManager.deleteSubreddit(i);
-                                }
-                            }
-                        })
-                        .setPositiveButton("Add Subreddit", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // Create an "Add Subreddit" dialog
-                                SubredditCreationDialogFragment dialogFragment =
-                                        new SubredditCreationDialogFragment();
-                                dialogFragment.show(getFragmentManager(), "SUBREDDIT");
-                            }
-                        })
-                        .show();
+                openSubredditAdd();
             }
         });
+
         getPosts();
         getSupportActionBar().hide();
     }
@@ -173,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         Collections.shuffle(suggestions); // Randomize items
 
         for (SuggestedSubreddit subreddit : SubredditUtils.getSuggestedSubreddits()) {
-            if (i >= 3) {
+            if (i >= 2) {
                 break; // Exit loop
             }
             if (!subreddits.contains(subreddit.getSubreddit())) {

@@ -5,8 +5,12 @@ package news.androidtv.subchannel.model;
  */
 
 public class SuggestedSubreddit {
+    public static final String CATEGORY_ART = "Artistic";
+    public static final String CATEGORY_CINEMA = "Cinema";
     public static final String CATEGORY_EDUCATION = "Educational";
+    public static final String CATEGORY_FUNNY = "Funny";
     public static final String CATEGORY_MEME = "Memes";
+    public static final String CATEGORY_MISC = "Community";
     public static final String CATEGORY_NSFW = "NSFW";
 
     private final String mCategory;
