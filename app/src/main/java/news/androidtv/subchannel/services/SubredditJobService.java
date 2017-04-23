@@ -35,8 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import news.androidtv.subchannel.model.RichSubreddit;
+import news.androidtv.subchannel.model.RichSubreddits;
 import news.androidtv.subchannel.utils.SettingConstants;
 import news.androidtv.subchannel.utils.SubchannelSettingsManager;
+import news.androidtv.subchannel.utils.SubredditUtils;
 import news.androidtv.subchannel.utils.YoutubeUtils;
 
 /**
@@ -47,7 +50,8 @@ public class SubredditJobService extends EpgSyncJobService {
     private static final String TAG = SubredditJobService.class.getSimpleName();
     public static final long DEFAULT_IMMEDIATE_EPG_DURATION_MILLIS = 1000 * 60 * 60; // 1 Hour
 
-    private Map<String, List<Submission>> mRetrievedData;
+    private Map<String, List<Submission>> mRetrievedSubmissions;
+    private Map<String, RichSubreddit> mRetrievedData;
     private SubchannelSettingsManager settingsManager;
 
     @Override
@@ -60,6 +64,7 @@ public class SubredditJobService extends EpgSyncJobService {
 
         settingsManager = new SubchannelSettingsManager(getApplicationContext());
         // Pull data from Reddit
+        mRetrievedSubmissions = new HashMap<>();
         mRetrievedData = new HashMap<>();
         new Thread(new Runnable() {
             @Override
@@ -69,18 +74,23 @@ public class SubredditJobService extends EpgSyncJobService {
                 Submissions subs = new Submissions(restClient);
                 Log.d(TAG, "Process all " +
                         settingsManager.getString(SettingConstants.KEY_SUBREDDITS_SAVED));
-                for (String subreddit : settingsManager.getSubreddits()) {
+                for (String dirtySubreddit : settingsManager.getSubreddits()) {
+                    String subreddit = SubredditUtils.sanitizeSubreddit(dirtySubreddit);
                     Log.d(TAG, "Pull subreddit " + subreddit);
-                    List<Submission> submissions =
-                            subs.ofSubreddit(subreddit, null, -1, 100, null, null, true);
-                    mRetrievedData.put(subreddit, submissions);
+                    try {
+                        List<Submission> submissions =
+                                subs.ofSubreddit(subreddit, null, -1, 100, null, null, true);
+                        mRetrievedSubmissions.put(subreddit, submissions);
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
 
                     // Right now this doesn't do anything valuable
-/*
-                    Subreddits subreddits = new Subreddits(restClient);
-                    List<Subreddit> subredditMetadata = subreddits.get(
-                            SubredditsView.POPULAR.value(), "1", "1", subreddit, subreddit);
-*/
+
+                    RichSubreddits subreddits = new RichSubreddits(restClient);
+                    RichSubreddit subredditMetadata = subreddits.getRichSubreddit(subreddit);
+                    Log.d(TAG, subredditMetadata.getBestIcon());
+                    mRetrievedData.put(subreddit, subredditMetadata);
                 }
                 new Handler(Looper.getMainLooper()) {
                     @Override
@@ -99,6 +109,7 @@ public class SubredditJobService extends EpgSyncJobService {
     public List<Channel> getChannels() {
         List<Channel> channelList = new ArrayList<>();
         int index = 1;
+        Log.d(TAG, mRetrievedData.keySet().toString());
         for (String subreddit : settingsManager.getSubreddits()) {
             InternalProviderData internalProviderData = new InternalProviderData();
             try {
@@ -106,9 +117,10 @@ public class SubredditJobService extends EpgSyncJobService {
             } catch (InternalProviderData.ParseException e) {
                 e.printStackTrace();
             }
+            Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getBestIcon());
             channelList.add(new Channel.Builder()
                     .setDisplayName("/r/" + subreddit)
-                    // TODO Need to obtain different logos somehow
+                    .setChannelLogo(mRetrievedData.get(subreddit).getBestIcon())
                     .setChannelLogo("https://raw.githubusercontent.com/ITVlab/SubChannel/master/store/haiku.PNG")
                     .setDisplayNumber(String.valueOf(index))
                     .setOriginalNetworkId(subreddit.hashCode())
@@ -128,7 +140,7 @@ public class SubredditJobService extends EpgSyncJobService {
         try {
             subreddit = (String) channel.getInternalProviderData()
                     .get(TifPlaybackService.IPD_KEY_SUBREDDIT);
-            submissions = mRetrievedData.get(subreddit);
+            submissions = mRetrievedSubmissions.get(subreddit);
         } catch (InternalProviderData.ParseException e) {
             e.printStackTrace();
         }

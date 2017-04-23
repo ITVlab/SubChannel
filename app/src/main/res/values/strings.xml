@@ -8,7 +8,11 @@
     <string name="error_sync_canceled">Sync canceled</string>
     <string name="error_sync_no_data">No data found</string>
     <string name="error_sync_default">Sync error %1$d</string>
-    <string name="long_description">"SubChannel is a Live Channel source that will be able to play a variety of YouTube videos from subreddits. You will also be able to use the native time-shifting and DVR features in Live Channels. This app is currently in alpha. Please report bugs or contribute to the GitHub project: github.com/itvlab/SubChannel."</string>
+    <string name="long_description">"SubChannel is a Live Channel source that can play YouTube videos from subreddits. You can use the native time-shifting and DVR features in Live Channels.\n\nThis app is currently in alpha.\n\nPlease report bugs or contribute to the GitHub project: github.com/itvlab/SubChannel."</string>
     <string name="open_live_channels">Open Live Channels</string>
     <string name="edit_channels">Edit Channels</string>
+    <string name="deleted_subreddit">Removed Subreddit from list</string>
+    <string name="warning_one_subreddit">You must have at least one subreddit</string>
+    <string name="add_subreddit">Add a Subreddit</string>
+    <string name="added_subreddit">Subreddit added</string>
 </resources>
