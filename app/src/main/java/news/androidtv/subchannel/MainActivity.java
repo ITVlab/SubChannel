@@ -13,24 +13,36 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.felkertech.settingsmanager.SettingsManager;
 import com.github.jreddit.entity.Submission;
+import com.github.jreddit.entity.Subreddit;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 
 import io.fabric.sdk.android.Fabric;
 import news.androidtv.subchannel.fragments.SubredditCreationDialogFragment;
+import news.androidtv.subchannel.model.SuggestedSubreddit;
+import news.androidtv.subchannel.shims.Function;
 import news.androidtv.subchannel.utils.SubchannelSettingsManager;
+import news.androidtv.subchannel.utils.SubredditUtils;
 
 import org.sonatype.guice.bean.containers.Main;
 import org.w3c.dom.Text;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -93,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateList();
+    }
+
     public void getPosts() {
         new Thread(new Runnable() {
             @Override
@@ -139,5 +157,93 @@ public class MainActivity extends AppCompatActivity {
                 logView.setText(data + "\n" + logView.getText());
             }
         }.sendEmptyMessage(0);
+    }
+
+    /**
+     * Programmatically display a series of Subreddits that already exist, and some suggested.
+     */
+    private void updateList() {
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.things); // TODO Rename this.
+        linearLayout.removeAllViews(); // Clear
+        linearLayout.addView(getHeading("Recommended"));
+        // Get your subreddits.
+        List<String> subreddits = Arrays.asList(new SubchannelSettingsManager(this).getSubreddits());
+        int i = 0;
+        List<SuggestedSubreddit> suggestions = Arrays.asList(SubredditUtils.getSuggestedSubreddits());
+        Collections.shuffle(suggestions); // Randomize items
+
+        for (SuggestedSubreddit subreddit : SubredditUtils.getSuggestedSubreddits()) {
+            if (i >= 3) {
+                break; // Exit loop
+            }
+            if (!subreddits.contains(subreddit.getSubreddit())) {
+                linearLayout.addView(getRecommendedButton(subreddit));
+                i++;
+            }
+        }
+
+        linearLayout.addView(getHeading("My Subreddits"));
+
+        for (i = 0; i < subreddits.size(); i++) {
+            linearLayout.addView(getMySubredditButton(subreddits.get(i), i));
+        }
+    }
+
+    private void openSubredditAdd() {
+        // Create an "Add Subreddit" dialog
+        SubredditCreationDialogFragment dialogFragment =
+                new SubredditCreationDialogFragment();
+        dialogFragment.show(getFragmentManager(), "SUBREDDIT");
+    }
+
+    private TextView getHeading(String txt) {
+        TextView heading = new TextView(this);
+        heading.setText(txt);
+        heading.setTextSize(18);
+        heading.setAllCaps(true);
+        heading.setPadding(0, 16, 0, 8);
+        return heading;
+    }
+
+    private Button getListButton(final String txt) {
+        Button myButton = new Button(this);
+        myButton.setText(txt);
+//        myButton.setBackgroundColor(getResources().getColor(android.R.color.white));
+        return myButton;
+    }
+
+    private Button getRecommendedButton(final SuggestedSubreddit subreddit) {
+        Button myButton = getListButton(subreddit.getSubreddit() + " - " +
+                subreddit.getCategory().toUpperCase());
+        myButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SubchannelSettingsManager settingsManager =
+                        new SubchannelSettingsManager(MainActivity.this);
+                settingsManager.addSubreddit(subreddit.getSubreddit());
+                Toast.makeText(MainActivity.this, R.string.added_subreddit, Toast.LENGTH_SHORT).show();
+                updateList();
+            }
+        });
+        return myButton;
+    }
+
+    private Button getMySubredditButton(String subreddit, final int index) {
+        Button myButton = getListButton(subreddit);
+        myButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SubchannelSettingsManager settingsManager = new SubchannelSettingsManager(MainActivity.this);
+                if (settingsManager.getSubreddits().length == 1) {
+                    Toast.makeText(MainActivity.this, R.string.warning_one_subreddit, Toast.LENGTH_SHORT).show();
+                } else {
+                    // TODO Show a manager dialog
+                    settingsManager.deleteSubreddit(index);
+                    Toast.makeText(MainActivity.this, R.string.deleted_subreddit, Toast.LENGTH_SHORT).show();
+                    updateList();
+                }
+            }
+        });
+        return myButton;
     }
 }

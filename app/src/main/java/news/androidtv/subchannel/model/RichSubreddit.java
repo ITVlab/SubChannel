@@ -25,11 +25,11 @@ public class RichSubreddit extends Subreddit {
      */
     public RichSubreddit(JSONObject obj) {
         super(obj);
-        if (obj.containsKey(KEY_ICON)) {
+        if (obj.containsKey(KEY_ICON) && obj.get(KEY_ICON) != null) {
             Log.d(TAG, obj.get(KEY_ICON) + "");
             mIconImg = obj.get(KEY_ICON).toString();
         }
-        if (obj.containsKey(KEY_HEADER)) {
+        if (obj.containsKey(KEY_HEADER) && obj.get(KEY_HEADER) != null) {
             Log.d(TAG, obj.get(KEY_HEADER) + "");
             mHeaderImg = obj.get(KEY_HEADER).toString();
         }
