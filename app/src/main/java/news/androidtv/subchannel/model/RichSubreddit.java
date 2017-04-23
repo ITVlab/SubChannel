@@ -12,6 +12,8 @@ import org.json.simple.JSONObject;
 
 public class RichSubreddit extends Subreddit {
     private static final String TAG = RichSubreddit.class.getSimpleName();
+    private static final String KEY_ICON = "icon_img";
+    private static final String KEY_HEADER = "header_img";
 
     private String mHeaderImg;
     private String mIconImg;
@@ -23,10 +25,14 @@ public class RichSubreddit extends Subreddit {
      */
     public RichSubreddit(JSONObject obj) {
         super(obj);
-        Log.d(TAG, obj.get("icon_img") + "");
-        mIconImg = obj.get("icon_img").toString();
-        Log.d(TAG, obj.get("header_img") + "");
-        mHeaderImg = obj.get("header_img").toString();
+        if (obj.containsKey(KEY_ICON)) {
+            Log.d(TAG, obj.get(KEY_ICON) + "");
+            mIconImg = obj.get(KEY_ICON).toString();
+        }
+        if (obj.containsKey(KEY_HEADER)) {
+            Log.d(TAG, obj.get(KEY_HEADER) + "");
+            mHeaderImg = obj.get(KEY_HEADER).toString();
+        }
     }
 
     public String getHeaderImage() {
