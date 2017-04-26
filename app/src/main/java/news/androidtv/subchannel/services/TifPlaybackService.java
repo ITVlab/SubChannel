@@ -117,6 +117,7 @@ public class TifPlaybackService extends BaseTvInputService {
                     super.onCompleted();
                     try {
                         Log.i(TAG, "Program ended, obtain the next");
+                        mYouTubePlayerView.pause();
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
@@ -158,6 +159,7 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public boolean onPlayRecordedProgram(final RecordedProgram recordedProgram) {
+            Log.d(TAG, "Play recorded program " + recordedProgram.toString());
             notifyVideoAvailable();
             setOverlayViewEnabled(false);
             setOverlayViewEnabled(true);
@@ -275,6 +277,7 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public void onTune(Uri channelUri) {
+            super.onTune(channelUri);
             // Right now we only have one channel
             notifyTuned(channelUri);
             mChannelUri = channelUri;
@@ -282,6 +285,7 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public void onStartRecording(Uri programUri) {
+            super.onStartRecording(programUri);
             // Don't bother with program uri
             Log.d(TAG, "Recording started");
             mRecordingStarted = System.currentTimeMillis();
