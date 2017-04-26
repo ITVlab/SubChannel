@@ -1,11 +1,9 @@
 package news.androidtv.subchannel.fragments;
 
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,16 @@ import news.androidtv.subchannel.utils.SubchannelSettingsManager;
 /**
  * Created by Nick on 2/20/2017.
  */
-
 public class SubredditCreationDialogFragment extends DialogFragment {
     private View mDialogView;
+    private Callback mCallback;
+
+    public SubredditCreationDialogFragment() {}
+
+    @SuppressLint("ValidFragment")
+    public SubredditCreationDialogFragment(Callback callback) {
+        mCallback = callback;
+    }
 
     @Nullable
     @Override
@@ -35,6 +40,9 @@ public class SubredditCreationDialogFragment extends DialogFragment {
                 settingsManager.addSubreddit(((EditText) mDialogView
                         .findViewById(R.id.edittext_name)).getText().toString());
                 dismiss();
+                if (mCallback != null) {
+                    mCallback.onDismiss();
+                }
             }
         });
         return mDialogView;
@@ -47,4 +55,7 @@ public class SubredditCreationDialogFragment extends DialogFragment {
         getDialog().getWindow().setLayout(900, 400);
     }
 
+    public interface Callback {
+        void onDismiss();
+    }
 }

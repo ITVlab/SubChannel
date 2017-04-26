@@ -1,5 +1,6 @@
 package news.androidtv.subchannel;
 
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -26,10 +27,12 @@ import com.github.jreddit.entity.Subreddit;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
+import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 
 import io.fabric.sdk.android.Fabric;
 import news.androidtv.subchannel.fragments.SubredditCreationDialogFragment;
 import news.androidtv.subchannel.model.SuggestedSubreddit;
+import news.androidtv.subchannel.services.SubredditJobService;
 import news.androidtv.subchannel.shims.Function;
 import news.androidtv.subchannel.utils.SubchannelSettingsManager;
 import news.androidtv.subchannel.utils.SubredditUtils;
@@ -169,10 +172,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateEpg() {
+        String inputId =  new SettingsManager(this).getString(EpgSyncJobService.BUNDLE_KEY_INPUT_ID);
+        SubredditJobService.requestImmediateSync1(this, inputId,
+                SubredditJobService.DEFAULT_IMMEDIATE_EPG_DURATION_MILLIS,
+                new ComponentName(this, SubredditJobService.class));
+    }
+
     private void openSubredditAdd() {
         // Create an "Add Subreddit" dialog
         SubredditCreationDialogFragment dialogFragment =
-                new SubredditCreationDialogFragment();
+                new SubredditCreationDialogFragment(new SubredditCreationDialogFragment.Callback() {
+                    @Override
+                    public void onDismiss() {
+                        updateList();
+                        updateEpg();
+                    }
+                });
         dialogFragment.show(getFragmentManager(), "SUBREDDIT");
     }
 
@@ -203,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 settingsManager.addSubreddit(subreddit.getSubreddit());
                 Toast.makeText(MainActivity.this, R.string.added_subreddit, Toast.LENGTH_SHORT).show();
                 updateList();
+                updateEpg();
             }
         });
         return myButton;
@@ -221,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
                     settingsManager.deleteSubreddit(index);
                     Toast.makeText(MainActivity.this, R.string.deleted_subreddit, Toast.LENGTH_SHORT).show();
                     updateList();
+                    updateEpg();
                 }
             }
         });

@@ -149,6 +149,8 @@ public class TifPlaybackService extends BaseTvInputService {
                     String videoId = YoutubeUtils.parseVideoId(program.getInternalProviderData()
                             .getVideoUrl());
                     mYouTubePlayerView.loadVideo(videoId);
+                    Log.d(TAG, "Loading video " + videoId);
+                    mYouTubePlayerView.play(); // Does that need to be explicit?
                 }
             });
             return true;
@@ -287,6 +289,11 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public void onStopRecording(Program programToRecord) {
+            if (programToRecord == null) {
+                Log.w(TAG, "Program is null.");
+                notifyError(TvInputManager.RECORDING_ERROR_UNKNOWN);
+                return;
+            }
             RecordedProgram recordedProgram = new RecordedProgram.Builder(programToRecord)
                     .setRecordingDataBytes(1024)
                     .setRecordingDurationMillis(1000 * 60) // FIXME need to get durations
@@ -297,6 +304,11 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public void onStopRecordingChannel(Channel channelToRecord) {
+            if (channelToRecord == null) {
+                Log.w(TAG, "Channel is null - " + mChannelUri);
+                notifyError(TvInputManager.RECORDING_ERROR_UNKNOWN);
+                return;
+            }
             // Need to get the program right now
             ContentResolver contentResolver = getContentResolver();
             mRecordingStopped = System.currentTimeMillis();

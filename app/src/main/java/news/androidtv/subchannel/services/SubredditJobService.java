@@ -150,6 +150,7 @@ public class SubredditJobService extends EpgSyncJobService {
             if (YoutubeUtils.parseVideoId(s.getUrl()) == null) {
                 continue; // Not a YouTube video, ignore post.
             }
+            // TODO Make a popout with post details, make EPG more generic
             InternalProviderData data = new InternalProviderData();
             data.setVideoUrl(s.getUrl());
             programList.add(new Program.Builder()
