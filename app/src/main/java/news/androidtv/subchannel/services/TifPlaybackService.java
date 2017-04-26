@@ -188,11 +188,6 @@ public class TifPlaybackService extends BaseTvInputService {
         }
 
         @Override
-        public void onTimeShiftPlay(Uri recordedProgramUri) {
-
-        }
-
-        @Override
         public View onCreateOverlayView() {
             if (mYouTubePlayerView == null) {
                 mYouTubePlayerView = new YouTubePlayerView(getApplicationContext());
