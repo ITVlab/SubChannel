@@ -121,7 +121,6 @@ public class SubredditJobService extends EpgSyncJobService {
             channelList.add(new Channel.Builder()
                     .setDisplayName("/r/" + subreddit)
                     .setChannelLogo(mRetrievedData.get(subreddit).getBestIcon())
-                    .setChannelLogo("https://raw.githubusercontent.com/ITVlab/SubChannel/master/store/haiku.PNG")
                     .setDisplayNumber(String.valueOf(index))
                     .setOriginalNetworkId(subreddit.hashCode())
                     .setInternalProviderData(internalProviderData)
