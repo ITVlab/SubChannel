@@ -295,7 +295,7 @@ public class TifPlaybackService extends BaseTvInputService {
             }
             RecordedProgram recordedProgram = new RecordedProgram.Builder(programToRecord)
                     .setRecordingDataBytes(1024)
-                    .setRecordingDurationMillis(1000 * 60) // FIXME need to get durations
+                    .setRecordingDurationMillis(System.currentTimeMillis() - mRecordingStarted)
                     .setInputId(mInputId)
                     .build();
             notifyRecordingStopped(recordedProgram);

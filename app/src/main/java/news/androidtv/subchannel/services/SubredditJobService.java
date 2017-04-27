@@ -153,13 +153,14 @@ public class SubredditJobService extends EpgSyncJobService {
             // TODO Make a popout with post details, make EPG more generic
             InternalProviderData data = new InternalProviderData();
             data.setVideoUrl(s.getUrl());
+            // Post each video separately
             programList.add(new Program.Builder()
                     .setTitle(s.getTitle())
                     .setThumbnailUri(s.getThumbnail())
                     .setDescription("Posted by " + s.getAuthor())
                     .setInternalProviderData(data)
-                    .setStartTimeUtcMillis(startMs + 1000 * 60 * i)
-                    .setEndTimeUtcMillis(startMs + 1000 * 60 * (i + 1)) // FIXME Don't know the video duration
+                    .setStartTimeUtcMillis(startMs + 1000 * 60 * 60 * i)
+                    .setEndTimeUtcMillis(startMs + 1000 * 60 * 60 * (i + 1)) // FIXME Don't know the video duration
                     .build());
             i++; // Increment index only for valid posts.
         }
