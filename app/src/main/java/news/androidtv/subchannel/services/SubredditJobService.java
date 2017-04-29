@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import news.androidtv.subchannel.R;
 import news.androidtv.subchannel.model.RichSubreddit;
 import news.androidtv.subchannel.model.RichSubreddits;
 import news.androidtv.subchannel.utils.SettingConstants;
@@ -118,12 +119,19 @@ public class SubredditJobService extends EpgSyncJobService {
                 e.printStackTrace();
             }
             Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getBestIcon());
+            Intent infoPanelIntent = new Intent(); // TODO Add a panel
+
             channelList.add(new Channel.Builder()
                     .setDisplayName("/r/" + subreddit)
                     .setChannelLogo(mRetrievedData.get(subreddit).getBestIcon())
                     .setDisplayNumber(String.valueOf(index))
                     .setOriginalNetworkId(subreddit.hashCode())
                     .setInternalProviderData(internalProviderData)
+                    .setAppLinkColor(getResources().getColor(R.color.colorPrimary))
+                    .setAppLinkText("Video Info")
+                    .setAppLinkIconUri("https://raw.githubusercontent.com/ITVlab/SubChannel/master/app/src/main/res/mipmap-mdpi/ic_launcher.png")
+                    .setAppLinkPosterArtUri(mRetrievedData.get(subreddit).getBestIcon())
+                    .setAppLinkIntent(infoPanelIntent)
                     .build());
             index++;
         }
@@ -142,6 +150,7 @@ public class SubredditJobService extends EpgSyncJobService {
             submissions = mRetrievedSubmissions.get(subreddit);
         } catch (InternalProviderData.ParseException e) {
             e.printStackTrace();
+            return programList;
         }
         int i = 0;
         for (Submission s : submissions) {
@@ -149,17 +158,24 @@ public class SubredditJobService extends EpgSyncJobService {
             if (YoutubeUtils.parseVideoId(s.getUrl()) == null) {
                 continue; // Not a YouTube video, ignore post.
             }
-            // TODO Make a popout with post details, make EPG more generic
+
             InternalProviderData data = new InternalProviderData();
             data.setVideoUrl(s.getUrl());
+            try {
+                data.put(TifPlaybackService.IPD_KEY_POST_TITLE, s.getTitle());
+                data.put(TifPlaybackService.IPD_KEY_POST_BY, s.getAuthor());
+                data.put(TifPlaybackService.IPD_KEY_POST_THUMB, s.getThumbnail());
+            } catch (InternalProviderData.ParseException e) {
+                e.printStackTrace();
+            }
             // Post each video separately
             programList.add(new Program.Builder()
-                    .setTitle(s.getTitle())
+                    .setTitle("Hottest Posts")
                     .setThumbnailUri(s.getThumbnail())
-                    .setDescription("Posted by " + s.getAuthor())
+                    .setDescription("The most upvoted posts currently on /r/" + subreddit)
                     .setInternalProviderData(data)
                     .setStartTimeUtcMillis(startMs + 1000 * 60 * 60 * i)
-                    .setEndTimeUtcMillis(startMs + 1000 * 60 * 60 * (i + 1)) // FIXME Don't know the video duration
+                    .setEndTimeUtcMillis(startMs + 1000 * 60 * 60 * (i + 1))
                     .build());
             i++; // Increment index only for valid posts.
         }

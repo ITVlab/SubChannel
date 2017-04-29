@@ -38,6 +38,11 @@ public class TifPlaybackService extends BaseTvInputService {
     private static final long EPG_SYNC_DELAYED_PERIOD_MS = 1000 * 2; // 2 Seconds
 
     public static final String IPD_KEY_SUBREDDIT = "subreddit_name";
+    public static final String IPD_KEY_POST_TITLE = "post_title";
+    public static final String IPD_KEY_POST_BY = "post_by";
+    public static final String IPD_KEY_POST_THUMB = "post_thumb";
+
+    public static Program currentProgram;
 
     @Override
     public void onCreate() {
@@ -108,6 +113,9 @@ public class TifPlaybackService extends BaseTvInputService {
                 requestEpgSync(mChannelUri);
                 return false;
             }
+            // Set curr prgm
+            currentProgram = program;
+
             notifyVideoAvailable();
             setOverlayViewEnabled(true);
             final TvPlayer.Callback[] callback = new TvPlayer.Callback[1];
@@ -160,6 +168,9 @@ public class TifPlaybackService extends BaseTvInputService {
         @Override
         public boolean onPlayRecordedProgram(final RecordedProgram recordedProgram) {
             Log.d(TAG, "Play recorded program " + recordedProgram.toString());
+
+            currentProgram = recordedProgram.toProgram();
+
             notifyVideoAvailable();
             setOverlayViewEnabled(false);
             setOverlayViewEnabled(true);
@@ -218,6 +229,7 @@ public class TifPlaybackService extends BaseTvInputService {
                 Log.d(TAG, "Program " + currentProgram.getTitle() + " ended");
             }
             while (query.moveToNext()) {
+                // TODO Do a better algorithm where we throw into list and shuffle
                 Program program = Program.fromCursor(query);
                 if (DEBUG) {
                     Log.i(TAG, "* " + program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
