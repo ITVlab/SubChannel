@@ -3,6 +3,7 @@ package news.androidtv.subchannel.services;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
@@ -26,6 +27,7 @@ import com.google.android.media.tv.companionlibrary.model.Program;
 import com.google.android.media.tv.companionlibrary.model.RecordedProgram;
 
 import news.androidtv.libs.player.YouTubePlayerView;
+import news.androidtv.subchannel.activities.ProgramInfoActivity;
 import news.androidtv.subchannel.utils.YoutubeUtils;
 
 /**
@@ -115,7 +117,12 @@ public class TifPlaybackService extends BaseTvInputService {
             }
             // Set curr prgm
             currentProgram = program;
+            // Show our info panel
+            Intent infoPanel = new Intent(mContext, ProgramInfoActivity.class);
+            infoPanel.putExtra(ProgramInfoActivity.EXTRA_TIMEOUT, 3000); // 3s
+            startActivity(infoPanel);
 
+            // Actually start getting our video playing
             notifyVideoAvailable();
             setOverlayViewEnabled(true);
             final TvPlayer.Callback[] callback = new TvPlayer.Callback[1];
@@ -230,6 +237,7 @@ public class TifPlaybackService extends BaseTvInputService {
             }
             while (query.moveToNext()) {
                 // TODO Do a better algorithm where we throw into list and shuffle
+                // TODO Cache our list getter so we only need to do it once
                 Program program = Program.fromCursor(query);
                 if (DEBUG) {
                     Log.i(TAG, "* " + program.getTitle() + "==" + currentProgram.getTitle() + ", " + query.getPosition() + "/" + query.getCount());
@@ -305,6 +313,7 @@ public class TifPlaybackService extends BaseTvInputService {
                 notifyError(TvInputManager.RECORDING_ERROR_UNKNOWN);
                 return;
             }
+            // TODO Use current program metadata
             RecordedProgram recordedProgram = new RecordedProgram.Builder(programToRecord)
                     .setRecordingDataBytes(1024)
                     .setRecordingDurationMillis(System.currentTimeMillis() - mRecordingStarted)

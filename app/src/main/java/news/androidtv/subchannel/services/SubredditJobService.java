@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import news.androidtv.subchannel.R;
+import news.androidtv.subchannel.activities.ProgramInfoActivity;
 import news.androidtv.subchannel.model.RichSubreddit;
 import news.androidtv.subchannel.model.RichSubreddits;
 import news.androidtv.subchannel.utils.SettingConstants;
@@ -119,7 +120,7 @@ public class SubredditJobService extends EpgSyncJobService {
                 e.printStackTrace();
             }
             Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getBestIcon());
-            Intent infoPanelIntent = new Intent(); // TODO Add a panel
+            Intent infoPanelIntent = new Intent(this, ProgramInfoActivity.class);
 
             channelList.add(new Channel.Builder()
                     .setDisplayName("/r/" + subreddit)
