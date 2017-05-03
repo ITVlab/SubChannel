@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.telecom.Call;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
@@ -44,7 +43,7 @@ public class TifPlaybackService extends BaseTvInputService {
     public static final String IPD_KEY_POST_BY = "post_by";
     public static final String IPD_KEY_POST_THUMB = "post_thumb";
 
-    public static Program currentProgram;
+    public static Program mCurrentProgram;
 
     @Override
     public void onCreate() {
@@ -116,7 +115,7 @@ public class TifPlaybackService extends BaseTvInputService {
                 return false;
             }
             // Set curr prgm
-            currentProgram = program;
+            mCurrentProgram = program;
             // Show our info panel
             Intent infoPanel = new Intent(mContext, ProgramInfoActivity.class);
             infoPanel.putExtra(ProgramInfoActivity.EXTRA_TIMEOUT, 3000); // 3s
@@ -143,6 +142,8 @@ public class TifPlaybackService extends BaseTvInputService {
                     } catch (IllegalStateException e) {
                         // Handler (android.os.Handler) {30477c7c} sending message to a Handler on a dead thread
                         // Restart the thread
+                        Log.w(TAG, e.getMessage());
+                        Log.w(TAG, "Restarting EVERYTHING");
                         TifPlaybackService.this.onCreate();
                     }
                 }
@@ -176,7 +177,7 @@ public class TifPlaybackService extends BaseTvInputService {
         public boolean onPlayRecordedProgram(final RecordedProgram recordedProgram) {
             Log.d(TAG, "Play recorded program " + recordedProgram.toString());
 
-            currentProgram = recordedProgram.toProgram();
+            mCurrentProgram = recordedProgram.toProgram();
 
             notifyVideoAvailable();
             setOverlayViewEnabled(false);
@@ -283,6 +284,7 @@ public class TifPlaybackService extends BaseTvInputService {
         private Uri mChannelUri;
         private long mRecordingStarted;
         private long mRecordingStopped;
+        private Program mProgramToRecord;
 
         public RedditRecordingSession(Context context, String inputId) {
             super(context, inputId);
@@ -304,6 +306,7 @@ public class TifPlaybackService extends BaseTvInputService {
             // Don't bother with program uri
             Log.d(TAG, "Recording started");
             mRecordingStarted = System.currentTimeMillis();
+            mProgramToRecord = mCurrentProgram;
         }
 
         @Override
@@ -313,8 +316,7 @@ public class TifPlaybackService extends BaseTvInputService {
                 notifyError(TvInputManager.RECORDING_ERROR_UNKNOWN);
                 return;
             }
-            // TODO Use current program metadata
-            RecordedProgram recordedProgram = new RecordedProgram.Builder(programToRecord)
+            RecordedProgram recordedProgram = new RecordedProgram.Builder(mProgramToRecord)
                     .setRecordingDataBytes(1024)
                     .setRecordingDurationMillis(System.currentTimeMillis() - mRecordingStarted)
                     .setInputId(mInputId)

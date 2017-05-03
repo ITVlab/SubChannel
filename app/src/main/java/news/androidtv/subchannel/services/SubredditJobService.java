@@ -171,7 +171,7 @@ public class SubredditJobService extends EpgSyncJobService {
             }
             // Post each video separately
             programList.add(new Program.Builder()
-                    .setTitle("Hottest Posts")
+                    .setTitle("Hot on /r/" + subreddit)
                     .setThumbnailUri(s.getThumbnail())
                     .setDescription("The most upvoted posts currently on /r/" + subreddit)
                     .setInternalProviderData(data)
