@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="480dp"
         android:orientation="vertical"
-        android:background="@color/dark_orange"
+        android:background="@color/darker_orange"
         android:padding="30dp"
         android:layout_height="match_parent">
         <ImageView
@@ -28,6 +28,7 @@
     </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
+        android:background="@color/dark_grey"
         android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"

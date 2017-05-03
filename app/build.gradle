@@ -58,7 +58,7 @@ dependencies {
     }
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
     compile 'com.github.fleker:settingsmanager:1.3.+'
-    compile 'com.github.itvlab:youtube-tv-player:65f13a3bbc'
+    compile 'com.github.itvlab:youtube-tv-player:-SNAPSHOT'
     compile 'com.google.android.libraries.tv:companionlibrary:0.1'
 
     testCompile 'junit:junit:4.10'
