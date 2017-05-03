@@ -119,6 +119,8 @@ public class SubredditJobService extends EpgSyncJobService {
             } catch (InternalProviderData.ParseException e) {
                 e.printStackTrace();
             }
+            Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getHeaderImage());
+            Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getIconImage());
             Log.d(TAG, subreddit + " -> " + mRetrievedData.get(subreddit).getBestIcon());
             Intent infoPanelIntent = new Intent(this, ProgramInfoActivity.class);
 

@@ -117,9 +117,10 @@ public class TifPlaybackService extends BaseTvInputService {
             // Set curr prgm
             mCurrentProgram = program;
             // Show our info panel
-            Intent infoPanel = new Intent(mContext, ProgramInfoActivity.class);
-            infoPanel.putExtra(ProgramInfoActivity.EXTRA_TIMEOUT, 3000); // 3s
-            startActivity(infoPanel);
+/*            Intent infoPanel = new Intent(mContext, ProgramInfoActivity.class);
+            infoPanel.putExtra(ProgramInfoActivity.EXTRA_TIMEOUT, 4000); // 4s
+            infoPanel.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(infoPanel);*/
 
             // Actually start getting our video playing
             notifyVideoAvailable();

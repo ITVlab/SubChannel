@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
         heading.setText(txt);
         heading.setTextSize(18);
         heading.setAllCaps(true);
+        heading.setTextColor(getResources().getColor(R.color.whitish));
         heading.setPadding(0, 16, 0, 8);
         return heading;
     }

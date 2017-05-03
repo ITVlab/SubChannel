@@ -52,9 +52,9 @@ public class RichSubreddit extends Subreddit {
     }
 
     public String getBestIcon() {
-        if (mIconImg != null) {
+        if (mIconImg != null && !mIconImg.isEmpty()) {
             return mIconImg;
-        } else if (mHeaderImg != null) {
+        } else if (mHeaderImg != null && !mHeaderImg.isEmpty()) {
             return mHeaderImg;
         }
         // App icon as a URL
