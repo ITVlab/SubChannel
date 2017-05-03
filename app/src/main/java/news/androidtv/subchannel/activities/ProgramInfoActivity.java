@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -54,7 +55,7 @@ public class ProgramInfoActivity extends Activity {
         // Sets the size and position of dialog activity.
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-        layoutParams.width = ActionBar.LayoutParams.MATCH_PARENT;
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.height = getResources().getDimensionPixelSize(R.dimen.side_panel_height);
         getWindow().setAttributes(layoutParams);
     }

@@ -1,5 +1,7 @@
 package news.androidtv.subchannel.services;
 
+import android.animation.Animator;
+import android.app.ActionBar;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -15,17 +17,30 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.text.Layout;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.media.tv.companionlibrary.BaseTvInputService;
 import com.google.android.media.tv.companionlibrary.TvPlayer;
 import com.google.android.media.tv.companionlibrary.model.Channel;
+import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
 import com.google.android.media.tv.companionlibrary.model.RecordedProgram;
 
 import news.androidtv.libs.player.YouTubePlayerView;
+import news.androidtv.subchannel.R;
 import news.androidtv.subchannel.activities.ProgramInfoActivity;
 import news.androidtv.subchannel.utils.YoutubeUtils;
 
@@ -74,7 +89,10 @@ public class TifPlaybackService extends BaseTvInputService {
     }
 
     class RedditTifService extends BaseTvInputService.Session {
+        private RelativeLayout mOverlayView;
         private YouTubePlayerView mYouTubePlayerView;
+        private LinearLayout mProgramInfo;
+
         private Context mContext;
         private String mInputId;
         private Uri mChannelUri;
@@ -116,15 +134,11 @@ public class TifPlaybackService extends BaseTvInputService {
             }
             // Set curr prgm
             mCurrentProgram = program;
-            // Show our info panel
-/*            Intent infoPanel = new Intent(mContext, ProgramInfoActivity.class);
-            infoPanel.putExtra(ProgramInfoActivity.EXTRA_TIMEOUT, 4000); // 4s
-            infoPanel.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(infoPanel);*/
-
             // Actually start getting our video playing
             notifyVideoAvailable();
             setOverlayViewEnabled(true);
+            populateInfoView();
+
             final TvPlayer.Callback[] callback = new TvPlayer.Callback[1];
             callback[0] = new TvPlayer.Callback() {
                 @Override
@@ -209,10 +223,51 @@ public class TifPlaybackService extends BaseTvInputService {
 
         @Override
         public View onCreateOverlayView() {
+            if (mOverlayView == null) {
+                mOverlayView = new RelativeLayout(getApplicationContext());
+                mOverlayView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                mOverlayView.setLayoutParams(layoutParams);
+            }
             if (mYouTubePlayerView == null) {
                 mYouTubePlayerView = new YouTubePlayerView(getApplicationContext());
+                mYouTubePlayerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                mYouTubePlayerView.setElevation(0);
+                mOverlayView.addView(mYouTubePlayerView);
             }
-            return mYouTubePlayerView;
+            if (mProgramInfo == null) {
+                mProgramInfo = (LinearLayout) LayoutInflater.from(getApplicationContext())
+                        .inflate(R.layout.activity_program_info, null);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.side_panel_height));
+                mProgramInfo.setLayoutParams(layoutParams);
+                mProgramInfo.requestLayout();
+                mProgramInfo.setAlpha(1);
+                mProgramInfo.setElevation(2);
+                mOverlayView.addView(mProgramInfo);
+                RelativeLayout.LayoutParams fLayoutParams = (RelativeLayout.LayoutParams) mProgramInfo.getLayoutParams();
+                fLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                mProgramInfo.setLayoutParams(fLayoutParams);
+                mProgramInfo.requestLayout();
+            }
+            return mOverlayView;
+        }
+
+        private void populateInfoView() {
+            // Populate info view.
+            try {
+                if (mCurrentProgram != null) {
+                    ((TextView) mProgramInfo.findViewById(R.id.info_title)).setText(
+                            mCurrentProgram.getInternalProviderData()
+                                    .get(TifPlaybackService.IPD_KEY_POST_TITLE).toString());
+                    ((TextView) mProgramInfo.findViewById(R.id.info_submitted)).setText(
+                            mCurrentProgram.getInternalProviderData()
+                                    .get(TifPlaybackService.IPD_KEY_POST_BY).toString());
+                }
+            } catch (InternalProviderData.ParseException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "Update our display");
+            mProgramInfo.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.info_enter_exit));
         }
 
         private void requestEpgSync(final Uri channelUri) {
